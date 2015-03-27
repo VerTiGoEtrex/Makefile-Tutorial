@@ -1,0 +1,32 @@
+# Global compiler and linker flags
+CXXFLAGS := --std=c++11 -g
+LDFLAGS := -ldl
+
+DEPS_DIR := includes
+DEPS := $(wildcard ${DEPS_DIR}/*.hpp)
+$(info $$DEPS is [${DEPS}])
+
+SRC_DIR := src
+SRC := $(wildcard ${SRC_DIR}/*.cpp)
+$(info $$SRC is [${SRC}])
+
+BUILD_DIR := build
+DEMO_OBJS := $(patsubst ${SRC_DIR}/%.cpp, ${BUILD_DIR}/%.o, ${SRC})
+$(info $$DEMO_OBJS is [${DEMO_OBJS}])
+
+CXXFLAGS += -I$(DEPS_DIR)
+$(info $$CXXFLAGS is [${CXXFLAGS}])
+
+all: directories demo.out
+
+directories:
+	mkdir -p	${BUILD_DIR}
+
+demo.out: $(DEMO_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+${BUILD_DIR}/%.o: ${SRC_DIR}/%.cpp $(DEPS)
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+clean:
+	rm -rf demo.out demo.out.dSYM build
